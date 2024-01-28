@@ -1,44 +1,108 @@
 
 <!DOCTYPE html>
-<html ng-app="downGit">
-<head>
-    
-    <!-------------------------------- META -------------------------------->
-    
-    <meta charset="utf-8"/>
-    <meta name="keywords" content="GitHub Directory Link, GitHub Directory, Github Link, GitHub Directory Download, GitHub, Download"/>
-    <meta name="description" content="Create GitHub Directory Download Link"/>
-    <meta name="author" content="Minhas Kamal"/>
-    
-    
-    <title>DownGit</title>
-    <link rel="icon" type="image/ico" href="res/images/downgit.png">
-    
-    
-    <!-------------------------------- LINK -------------------------------->
-    
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous" />
-    <link href="lib/angular-toastr(2.0.0).min.css" rel="stylesheet"/>
-    
-    <link href="app/site.css" rel="stylesheet" />
-</head>
-<body>
-    
-    <div ng-view class=""></div>
-    
-    
-    <!------------------------------- SCRIPT ------------------------------>
-    
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular-route.min.js"></script>
-    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-    <script src="lib/angular-toastr(2.0.0).tpls.min.js"></script>
-    <script src="https://cdn.rawgit.com/Stuk/jszip/v3.0.0/dist/jszip.min.js"></script>
-    <script src="lib/filesaver.min.js"></script>
+<html>
+  <head>
+    <title>Github Raw Link Generator</title>
+    <style>
+      #input-url {
+        text-align: center;
+        width: 600px;
+      }
+      h1 {
+        text-align: center;
+        width: 600px;
+        margin: 0 auto;
+      }
+            form {
+        text-align: center;
+        width: 600px;
+        margin: 0 auto;
+      }
 
-    <script src="https://minhaskamal.github.io/DownGit/app/app.js"></script>
-    <script src="https://minhaskamal.github.io/DownGitapp/home/home.js"></script>
-    <script src="https://minhaskamal.github.io/DownGitapp/home/down-git.js"></script>
-</body>
+      p {
+        text-align: center;
+        width: 600px;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Github Raw Link Generator</h1>
+    <br>
+    <p>
+      In order to use github to serve content on other websites you need to convert the github link to
+      a raw link. This tool helps you do this. You can also save your list
+      as a table for later use.
+    </p>
+    <br>
+    <p>
+      For example: "https://github.com/coolperson/project/blob/main/Audio/fun.mp3"
+      becomes
+      "https://raw.githubusercontent.com/coolperson/project/main/Audio/fun.mp3".
+    </p>
+    <br />
+    <i class="fas fa-clipboard"></i>
+    <p>Enter a URL in the input box below:</p>
+
+    <form>
+      <input type="text" id="input-url" />
+      <button type="button" onclick="processURL()">Process URL</button
+      ><button type="button" onclick="saveList()">Save list as CSV</button>
+    </form>
+    <ul id="output-list"></ul>
+    <script>
+      function processURL() {
+        // Get the value of the input box
+        var inputUrl = document.getElementById("input-url").value;
+        // Process the URL using the provided code
+        var outputUrl = inputUrl
+          .replace("github.com", "raw.githubusercontent.com")
+          .replace("/blob/", "/")
+          .replace("?raw=true", "");
+        // Create a list item with the link and the "Copy to clipboard" button
+        var listItem = document.createElement("li");
+        var link = document.createElement("a");
+        link.href = outputUrl;
+        link.textContent = outputUrl;
+        var button = document.createElement("button");
+        button.textContent = "Copy";
+        button.onclick = function () {
+          copyToClipboard(outputUrl);
+        };
+        listItem.appendChild(link);
+        listItem.appendChild(button);
+        // Append the list item to the list
+        var list = document.getElementById("output-list");
+        list.appendChild(listItem);
+      }
+      function downloadCSV(csv) {
+        var link = document.createElement("a");
+        link.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+        link.download = "urls.csv";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      function saveList() {
+        // Get the list of links
+        var links = document.querySelectorAll("#output-list a");
+        // Create a CSV string from the list of links
+        var csv = "URL\n";
+        links.forEach(function (link) {
+          csv += link.textContent + "\n";
+        });
+        // Download the CSV file
+        downloadCSV(csv);
+      }
+      function copyToClipboard(text) {
+        var textarea = document.createElement("textarea");
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+    </script>
+  </body>
 </html>
